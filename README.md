@@ -4,7 +4,7 @@ Can software changes help me keep using an ageing laptop instead of buying anoth
 
 ## Introduction
 
-I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and about 6.7 GiB of usable RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable.
+I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable.
 
 Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. I then wanted to see whether tuning the Linux kernel for the hardware I already have could improve it further, with help from AI agents to prepare the custom kernels and document the changes. I chose Firefox, Claude and Codex for the tests because they are among the applications I use most often. The experiment asks whether the custom kernels make these applications open faster without increasing idle power use.
 
@@ -20,7 +20,7 @@ Viduka and colleagues studied the reuse of old computers with open source softwa
 |---|---|
 | Laptop | Huawei MateBook 14, KPL-W0X |
 | CPU | AMD Ryzen 5 2500U, 4 cores / 8 threads |
-| Usable RAM | Approximately 6.7 GiB |
+| RAM | 8 GB installed; approximately 6.7 GiB usable |
 | Operating system | Linux Mint 22.3, X11 session required by the protocol |
 | Battery | Worn; the recorded full-charge capacity was 80.3% of its original design capacity |
 | Power readout | Battery current × voltage; the script also supports `power_now` |
