@@ -87,16 +87,15 @@ I cannot choose a kernel from this protocol until there are measurements. A poin
 
 ## Stated limitations
 
-- Apps run in a fixed order, Firefox, Claude, then Codex. Later tests may be affected by warming. Each app gets the same CPU load and ten-second lead-in. Compare each app across kernels, not different apps against one another.
-
-- The results will apply to this laptop and its worn battery. One planned session per kernel gives little basis for generalizing to other machines.
-- Ten startup repetitions per app are few. Consecutive battery readings are not independent sessions, and between-reboot variability is not measured.
-- Temperature, CPU frequency, background services, Wi-Fi activity and display configuration can affect both measurements. A settling delay does not prove that temperature has stabilized.
-- The comparison changes the kernel version from 7.0 to 7.2.9, compiler, configuration and patches together. It cannot attribute a difference to BORE, ThinLTO or RCU alone.
-- Mint uses the laptop's existing memory settings and a changed preemption setting. It is not an untouched default installation.
-- The startup measurement stops when the window appears. I still need to check that the script detects the correct Firefox window and closes its processes properly.
-- Battery sensors have finite resolution and update intervals; current and voltage are read consecutively. No external wattmeter is used.
-- The analysis reports descriptive statistics, with no significance test or uncertainty interval. It does not establish battery runtime under real workloads.
+- This is one laptop with a worn battery. Other computers may give different results.
+- I plan one session per kernel and 10 launches per app. This will not show how much the results change between reboots. The battery readings all come from the same session, not separate tests.
+- Heat, CPU speed, background programs, Wi-Fi and screen settings can affect the results. Waiting before a test does not guarantee that the laptop has cooled down.
+- The apps always run in the same order: Firefox, Claude, then Codex. Each gets the same CPU load and a ten-second wait before timing starts, but the laptop may be warmer for the later apps. Compare each app with itself across kernels.
+- Several things change together, including the kernel version, build tools and settings. A better result would not tell us which change caused it.
+- Mint already has changed memory and preemption settings. It is not a default installation.
+- Timing stops when a window appears, not when the app is fully ready. Window detection and proper app shutdown still need to be checked in real runs.
+- Power readings come from the laptop's battery sensor, not an external meter. The sensor has limited precision and refresh speed, and current and voltage are read one after the other.
+- The analysis summarizes the measurements. It does not test whether small differences are meaningful or calculate a range of uncertainty. Idle power does not tell us how long the battery will last during everyday use.
 
 ## AI-assisted implementation and ownership
 
