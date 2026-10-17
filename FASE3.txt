@@ -1,0 +1,69 @@
+FASE 3 — ANALISI PREPARATA, NON ESEGUITA
+
+Script: scripts/02-analyze.py
+Dipendenze: Python 3 e Matplotlib (nessuna installazione eseguita).
+
+Quando saranno disponibili i dati reali, dalla cartella del pacchetto:
+
+    python3 scripts/02-analyze.py
+
+INPUT
+
+Legge esclusivamente results/<kernel>.csv per i cinque kernel previsti
+nella fase 2. Ignora work/ e non crea dati mancanti o simulati.
+Richiede 10 tempi Firefox e 120 valori di potenza per ogni CSV presente,
+con identificatori unici, unità corrette e valori finiti strettamente positivi.
+Un kernel privo di file viene indicato come Not measured.
+Un file presente ma incompleto o non valido blocca tutta la generazione.
+
+Verifica che i tempi di campionamento siano crescenti e distino al massimo
+1 secondo dalle scadenze 5, 10, ..., 600 s. Questa è una tolleranza operativa
+dell'analisi, non una precisione garantita del sensore. Fuori tolleranza
+richiede ispezione: non elimina né ricostruisce campioni.
+
+OUTPUT
+
+Una tabella: docs/results-summary.md, mostrata anche nel terminale.
+Una figura: docs/figures/kernel-tradeoff.png.
+
+La tabella riporta mediana dei 10 tempi e media aritmetica dei 120 watt.
+Differenza percentuale = 100 * (valore_kernel / valore_Mint - 1).
+Il riferimento è 7.0.0-38-generic. I calcoli precedono l'arrotondamento.
+Valori negativi indicano tempo o potenza inferiori rispetto al riferimento.
+Se Mint manca, le differenze sono N/A; non viene usato un altro riferimento.
+
+La figura ha il tempo mediano in secondi sull'asse x e la potenza media
+in watt sull'asse y, con un punto per kernel misurato. Gli assi partono
+da zero; forme e colori identificano i kernel nella legenda.
+Punti coincidenti possono sovrapporsi: non si applica spostamento artificiale.
+I punti mancanti non sono collocati a zero. Nessuna barra di errore inventata.
+
+In assenza di CSV lo script si ferma senza creare tabella o figura.
+Gli output precedenti, se esistono, non vengono eliminati quando l'analisi
+fallisce: non considerarli aggiornati dopo un errore.
+
+INTERPRETAZIONE E LIMITI
+
+Il basso a sinistra favorisce entrambe le misure. Se un kernel è più rapido
+ma consuma di più, questi dati non definiscono da soli un vincitore unico.
+Lo script non produce un punteggio composito né una classifica automatica.
+Le statistiche sono descrittive: una sola sessione per kernel non misura
+la variabilità fra riavvii, e 120 campioni consecutivi della batteria non
+sono 120 sessioni indipendenti. Nessuna significatività viene dichiarata.
+
+Prima di interpretare confronta manualmente configs/<kernel>.txt:
+versioni degli strumenti, hash del profilo, luminosità e parametri di boot.
+Lo script controlla la struttura numerica, non certifica condizioni uguali,
+raffreddamento, assenza di carichi estranei o correttezza della misura X11.
+Mint resta la baseline installata con le regolazioni globali già presenti.
+
+VERIFICA DI QUESTA FASE
+
+Controllo statico della sintassi Python e compatibilità con le colonne
+prodotte nella fase 2. Nessuna esecuzione dell'analisi, misura o figura
+di esempio. La verifica visiva del PNG attende i dati reali.
+
+PROSSIMO PASSO
+
+Revisione con l'utente e conferma prima della fase 4.
+Le misure restano sospese.

@@ -1,0 +1,137 @@
+FASE 2 — SCRIPT PREPARATI, MISURE NON ESEGUITE
+
+Questo pacchetto contiene soltanto la preparazione della fase 2.
+Non contiene risultati, analisi o conclusioni sulle prestazioni.
+
+FILE
+
+scripts/00-profile.sh: prepara una volta il profilo Firefox dedicato.
+scripts/01-benchmark.sh: una sessione completa per kernel dopo il riavvio.
+scripts/firefox-prepare.sh: controlli, copia del profilo e cache fredda.
+scripts/firefox-start.sh: avvio fino alla prima finestra Firefox visibile.
+scripts/firefox-stop.sh: chiusura dei soli processi Firefox della prova.
+
+I tre script firefox-* vengono chiamati da hyperfine, non a mano.
+Sono separati per lasciare preparazione e chiusura fuori dal cronometro.
+Non ci sono funzioni wrapper.
+
+PREREQUISITI DA RISOLVERE QUANDO RIPRENDEREMO LE PROVE
+
+Linux Mint con sessione X11, terminale avviato dall'utente normale,
+Firefox, hyperfine 1.15–1.x, stress-ng, xdotool, Python 3, NetworkManager,
+util-linux, procps e strumenti GNU standard. Hyperfine 2.x non è accettato:
+ha un formato JSON diverso; non adattarlo silenziosamente fra due kernel.
+Le versioni dei programmi devono restare uguali in tutte le sessioni.
+
+Servono privilegi sudo soltanto per svuotare la cache. Non avviare l'intero
+script con sudo. Gli script non installano pacchetti né cambiano sysctl,
+governor, luminosità, schermi, configurazione GRUB o alimentazione.
+
+PROFILO — PRIMA DELLA CAMPAGNA, NON ORA
+
+Dalla cartella di questo pacchetto:
+
+    bash scripts/00-profile.sh
+
+Chiudi prima ogni Firefox personale. Attendi about:blank, completa eventuali
+schermate iniziali, poi chiudi il Firefox dedicato normalmente. Il profilo
+di riferimento resta in work/profile-base e viene riutilizzato per tutti
+i kernel. Non effettuare login e non visitare siti in questo profilo.
+Ogni ripetizione ne riceve una copia separata, evitando di confrontare
+un primo avvio con un profilo progressivamente modificato dalle prove.
+Il suo hash viene registrato nei metadati, dopo le versioni degli strumenti.
+
+SESSIONE PER KERNEL — SOLO QUANDO RIATTIVEREMO LE PROVE
+
+    bash scripts/01-benchmark.sh
+
+Chiudi tutti i programmi, compreso Codex/ChatGPT, lasciando soltanto il
+terminale. Ferma download, aggiornamenti e altri lavori. Mantieni lo stesso
+assetto degli schermi: lo script non sposta o ridimensiona ChatGPT.
+Scollega l'alimentatore, lascia Wi-Fi acceso e usa la stessa luminosità
+in tutte le sessioni. Disabilita manualmente oscuramento e sospensione
+per la durata della prova, annotando le impostazioni per ripristinarle.
+Attendi che il portatile si raffreddi prima di confermare MISURA.
+
+1. Lo script registra kernel, cmdline filtrata, versioni, hash del profilo,
+   luminosità e sorgente della lettura della batteria.
+2. Dopo 120 secondi di assestamento, acquisisce 120 campioni di potenza
+   a scadenze di 5 secondi, dal secondo 5 al secondo 600.
+3. Chiede sudo, avvia stress-ng --cpu 8 --cpu-method int64, attende
+   10 secondi e avvia le 10 ripetizioni hyperfine senza warmup.
+4. Prima di ciascuna ripetizione copia il profilo e svuota page cache,
+   dentries e inode con sync e drop_caches=3. Controlla gli otto worker.
+5. Chiude il Firefox di prova dopo ogni misura e termina il carico alla fine.
+
+La batteria viene misurata prima del carico per evitare il suo calore residuo.
+I due minuti non certificano equilibrio termico. Il raffreddamento iniziale
+e le condizioni di contorno restano responsabilità di chi conduce la prova.
+
+DEFINIZIONI DELLE DUE MISURE
+
+Reattività: secondi fino al rilevamento di una finestra Firefox visibile
+su X11, appartenente al PID avviato, con pagina about:blank. Include il
+piccolo overhead del helper Bash e del rilevamento xdotool. Non misura
+completo rendering, interattività o caricamento di una pagina web.
+La cache del sistema operativo viene svuotata; non quella interna del disco.
+La chiusura dei processi non entra nel tempo misurato.
+
+Potenza a riposo: power_now / 10^6 oppure current_now * voltage_now / 10^12,
+in watt. Le letture corrente/tensione sono consecutive, non atomiche.
+Sono letture del sensore batteria, non misure con un wattmetro esterno.
+Campionamento, terminale e servizi di sistema introducono un piccolo carico.
+Il risultato non è una misura diretta dell'autonomia nell'uso quotidiano.
+
+OUTPUT E CONTROLLO VISIVO
+
+results/<kernel>.csv contiene:
+
+    kernel,metric,replicate,elapsed_s,value,unit
+
+metric=idle_power: 120 valori in W e tempi effettivi di campionamento.
+metric=firefox_startup: 10 tempi individuali in s; elapsed_s vuoto.
+Il file completo ha 131 righe, compresa l'intestazione. Head, uniq -c e
+wc -l sono già eseguiti alla fine. Controlla gli intervalli effettivi dei
+campioni: un sistema sospeso o fortemente ritardato invalida la sessione.
+
+configs/<kernel>.txt conserva i metadati. La cmdline viene letta all'inizio,
+ma pubblicata solo con una lista ammessa di parametri; il numero di token
+omessi è dichiarato. Non viene salvata la cmdline integrale con UUID/percorsi.
+Se altri parametri prestazionali sono necessari, il filtro va aggiornato
+esplicitamente e nello stesso modo per tutta la campagna.
+
+work/ contiene profili, log Firefox/stress-ng, JSON hyperfine e CSV parziale.
+È esclusa da Git: non pubblicarla, nemmeno in un repository privato.
+Il CSV finale compare solo dopo il completamento di entrambe le misure.
+Se la sessione fallisce, la cartella resta per l'ispezione e una nuova
+esecuzione si ferma: non elimina né sovrascrive automaticamente le prove.
+
+LIMITI E CONTROLLI MANUALI
+
+Lo script verifica batteria e luminosità a ogni campione e prima di ogni
+avvio Firefox. Verifica Wi-Fi all'inizio e dopo le due serie, non monitora
+continuamente traffico o connessione. Non garantisce l'assenza di servizi
+in background. La luminosità viene conservata, non imposta automaticamente:
+devi confrontare il valore registrato fra i kernel.
+
+Un timeout della finestra o un errore di chiusura invalida la sessione.
+Su questo Firefox il collegamento PID/finestra resta da verificare dal vivo.
+Un controllo di sintassi non dimostra che il benchmark funzioni sull'hardware.
+
+Gli script non effettuano grub-reboot né reboot. L'ID della voce Mint deve
+ancora essere verificato. Ogni riavvio sarà proposto separatamente e richiederà
+conferma esplicita; non viene impostato alcun avvio futuro in questa fase.
+
+RIFERIMENTI DEL PROTOCOLLO
+
+Hyperfine 1.19: --prepare prima di ogni ripetizione, --conclude dopo ciascuna;
+JSON per i tempi individuali, CSV nativo per le statistiche riassuntive:
+https://github.com/sharkdp/hyperfine/blob/v1.19.0/doc/hyperfine.1
+
+xdotool: --sync, --onlyvisible e filtro PID su X11:
+https://github.com/jordansissel/xdotool
+
+PROSSIMO PASSO
+
+Revisione degli script con l'utente. Nessuna prova è autorizzata ora.
+L'analisi Python e il repository GitHub appartengono alle fasi successive.

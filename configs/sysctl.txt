@@ -1,0 +1,14 @@
+# Shared system settings observed during phase 1; not an installation script.
+vm.swappiness=150
+vm.page-cluster=0
+vm.watermark_boost_factor=0
+vm.watermark_scale_factor=125
+vm.compaction_proactiveness=0
+vm.max_map_count=1048576
+kernel.nmi_watchdog=1
+kernel.hardlockup_panic=1
+kernel.softlockup_panic=1
+kernel.panic_on_oops=1
+kernel.panic=10
+# Additional live observation: kernel.sched_bore=1 on reactive2.
+# CPU driver: acpi-cpufreq; governor: schedutil; zram compressor: zstd.

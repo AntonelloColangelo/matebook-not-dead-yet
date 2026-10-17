@@ -1,0 +1,21 @@
+{
+  "source_archive_recorded_not_rehashed": {
+    "url": "https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.2.9.tar.xz",
+    "archive": "linux-7.2.9.tar.xz",
+    "sha256": "b4c5dfbe51a364a6c7f03869200f88c8e1f77403539005f14b7fc6bc91b8d8ba"
+  },
+  "patches_hashes_recomputed": [
+    {
+      "name": "BORE",
+      "sha256": "432c4e2f750d09b255024d547bdf5b014862ab297083ea04c62869db90d920ee",
+      "version": "6.8.0",
+      "commit": "d429c0226fb5d25d51e6869a4bf7d8256e1122ff",
+      "url": "https://raw.githubusercontent.com/firelzrd/bore-scheduler/d429c0226fb5d25d51e6869a4bf7d8256e1122ff/patches/stable/0001-linux7.2-rc1-bore-6.8.0.patch"
+    },
+    {
+      "name": "TTM beneficial_order",
+      "sha256": "5dd3b0c6339560f9dd6eddc36f5fc24ece3be11cca02ede51f600ad84fbed8b6",
+      "upstream": "drm/ttm: Issue direct reclaim at beneficial_order (Matthew Brost, v5 3/5, 2026-05-06, https://lore.gitlab.freedesktop.org/drm-ai-reviews/20260506033300.3534883-4-matthew.brost@intel.com/)"
+    }
+  ]
+}
