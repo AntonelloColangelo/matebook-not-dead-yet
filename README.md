@@ -1,6 +1,8 @@
 # Can kernel tuning improve an ageing laptop? An AI-assisted case study
 
-Can software changes help me keep using an ageing laptop instead of buying another one?
+## Abstract
+
+This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. AI agents helped prepare custom kernels and benchmark scripts under my direction. I plan to compare these kernels with the installed Mint kernel by measuring how long Firefox, Claude and Codex take to show a window under CPU load, and how much power the laptop uses at idle. The benchmarks have not been run and remain paused. No results are available yet, so I cannot say whether the custom kernels offer an improvement.
 
 ## Introduction
 
