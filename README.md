@@ -1,10 +1,10 @@
 # Linux kernel responsiveness and idle power on a Huawei MateBook 14
 
-**Which kernel offers the best trade-off between application startup time and idle battery power on a Ryzen 5 2500U laptop with 6.7 GiB of usable RAM?**
+Which kernel offers the best trade-off between application startup time and idle battery power on a Ryzen 5 2500U laptop with 6.7 GiB of usable RAM?
 
-This is an independent hardware experiment by a junior bioinformatician. The aim is to make an existing laptop more responsive without increasing its energy use. The approach is straightforward: state the question, keep the workload fixed, retain the measurements, and report what they do and do not establish.
+I'm a junior bioinformatician, and this is an independent experiment on my laptop. I want to find out whether a custom kernel can make applications open faster without increasing energy use. I will compare the kernels under the same workload and keep the measurements alongside the scripts.
 
-**Status: benchmarks are paused. No results are available for this protocol.** The measurement and analysis scripts have been prepared and checked statically, but have not been run on this hardware. No speedup, power saving or winning kernel has been established.
+**Benchmarks are paused.** The measurement and analysis scripts have had static checks, but have not been run on this hardware. There are no results for this protocol yet, so I cannot say whether any kernel is faster or uses less power.
 
 ## Hardware
 
@@ -18,7 +18,7 @@ This is an independent hardware experiment by a junior bioinformatician. The aim
 | Power readout | Battery current × voltage; the script also supports `power_now` |
 | Baseline | Installed Mint kernel `7.0.0-38-generic`, with existing shared system tuning |
 
-The battery capacity ratio is an inventory observation, not a benchmark result or a battery-runtime estimate.
+The capacity ratio above comes from the hardware inventory. It does not measure battery runtime or the effect of a kernel change.
 
 ## What changed and why
 
@@ -30,30 +30,30 @@ The battery capacity ratio is an inventory observation, not a benchmark result o
 | 7.2.9-kpl-reactive | Clang/LLD 19.1.1, ThinLTO, BORE, HZ=1000, full preemption, RCU offloading | BORE 6.8.0 |
 | 7.2.9-kpl-reactive2 | reactive configuration plus disabled ACPI debugging and enabled zram multiple compression support | BORE 6.8.0 and TTM beneficial_order |
 
-**BORE** changes CPU scheduling to favour short bursts of work, with the intention of improving interactive response under contention. It is a candidate mechanism, not evidence that applications start faster on this laptop.
+BORE changes CPU scheduling to favour short bursts of work. The aim is to improve interactive response when tasks compete for CPU time. Whether that makes applications start faster on this laptop remains to be measured.
 
-**Preemption** controls when running kernel work can yield to other runnable tasks. Full and lazy preemption make different latency/overhead trade-offs; their effect here needs measurement. ThinLTO additionally optimizes across compilation units.
+Preemption controls when running kernel work can yield to other runnable tasks. Full and lazy preemption trade latency against overhead, and their effect here still needs measurement. ThinLTO optimizes code across compilation units.
 
-**`rcu_nocbs=all`** moves RCU callback processing to dedicated kernel threads. Together with `rcutree.enable_rcu_lazy=1`, it is intended to alter callback timing and batching; neither flag guarantees lower power consumption.
+`rcu_nocbs=all` moves RCU callback processing to dedicated kernel threads. Together with `rcutree.enable_rcu_lazy=1`, it changes how callbacks are scheduled and batched. Lower power consumption is not guaranteed.
 
 All custom kernels also use a reduced driver configuration, native CPU targeting, disabled NUMA and idle tick suppression. MGLRU and the underlying RCU capabilities already exist in the Mint baseline. Memory sysctls apply globally, including when Mint is booted. The active zram compressor at inventory time was ZSTD, although the custom kernel configuration defaults to LZ4.
 
-See [selected configuration differences](configs/README.md), [build reconstruction](docs/build-inventory.md) and [patch provenance](patches/README.md). These are comparisons of complete kernel configurations, not isolated tests of individual patches.
+The [configuration differences](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) record these changes. The experiment compares complete kernel configurations, so it cannot isolate the effect of an individual patch.
 
 ## Measurement protocol
 
-Only two outcomes are planned, once per kernel after reboot:
+I plan one session per kernel after reboot, with two measurements:
 
-1. **Firefox cold startup:** 10 repetitions with hyperfine under `stress-ng --cpu 8 --cpu-method int64`. Each repetition copies the same initialized, dedicated Firefox profile and clears the operating-system caches. Timing ends when xdotool detects the launched process's visible Firefox window on X11. Profile preparation and process shutdown are outside the timing.
-2. **Idle battery power:** 120 samples at five-second deadlines over ten minutes. This runs before the CPU load, after a short settling period, with the charger disconnected, fixed brightness, Wi-Fi on and only the terminal open.
+1. Measure 10 cold starts of Firefox with hyperfine while `stress-ng --cpu 8 --cpu-method int64` runs. Before each repetition, the script copies the same initialized Firefox profile and clears the operating-system caches. Timing ends when xdotool detects that process's visible Firefox window on X11. Copying the profile and closing Firefox are outside the timed interval.
+2. Record 120 battery-power readings at five-second deadlines over ten minutes of idle time. This happens before the CPU load, after a short settling period. The charger stays disconnected, brightness stays fixed, Wi-Fi stays on, and only the terminal remains open.
 
-The startup measure is time to a visible window, not full rendering or interactivity. Cold cache refers to the operating-system cache, not a guarantee about the drive's internal cache. The power measure is idle power, not battery runtime during daily work.
+Window visibility does not establish that Firefox has finished rendering or is ready for interaction. Clearing the operating-system cache does not guarantee that the drive's internal cache is empty. Idle power also does not tell us how long the battery will last during daily work.
 
 ## Scripts and future execution
 
 **Do not run the measurement scripts until the benchmark campaign is explicitly resumed.** No script changes GRUB or reboots the computer. Each future reboot requires separate confirmation.
 
-The prerequisites are Firefox, hyperfine 1.15–1.x, stress-ng, xdotool, Python 3, NetworkManager and standard Linux tools. Analysis additionally needs Matplotlib. Dependencies have not been installed as part of this project. Hyperfine 2.x is deliberately rejected because its JSON format differs.
+The scripts need Firefox, hyperfine 1.x starting with version 1.15, stress-ng, xdotool, Python 3, NetworkManager and standard Linux tools. The analysis also needs Matplotlib. These dependencies have not been installed as part of this project. The benchmark script rejects hyperfine 2.x because its JSON format differs.
 
 After resuming, from the repository root:
 
@@ -72,30 +72,30 @@ The Bash scripts have Italian comments and a linear layout. [Phase 2 instruction
 
 ## Results
 
-**Not yet available.** There are no measurement CSVs, numerical results or generated figures in this version. Historical measurements from other protocols have not been imported.
+There are no measurement CSVs, numerical results or generated figures yet. This repository does not include earlier measurements made with other protocols.
 
-Once real CSVs exist, the analysis generates exactly one summary table (`docs/results-summary.md`) and one scatter plot (`docs/figures/kernel-tradeoff.png`). The table reports median startup seconds, mean idle watts and percentage changes relative to Mint. The plot places startup time on x and power on y, with one point per measured kernel.
+Once measurements are available, the analysis script will produce one table in `docs/results-summary.md` and one scatter plot in `docs/figures/kernel-tradeoff.png`. The table reports median startup time in seconds, mean idle power in watts and percentage changes relative to Mint. The plot has startup time on the x-axis and power on the y-axis, with one point per measured kernel.
 
-Missing kernels are marked *Not measured*. Without Mint, percentage changes remain unavailable. No missing value is replaced with zero or an estimate. The figure is regenerated from data, never drawn or adjusted manually. The generated table and figure will be embedded here after measurement and review.
+The script marks missing kernels as *Not measured* and leaves percentage changes unavailable if Mint has not been measured. It does not fill gaps with zeros or estimates. I will add the generated table and figure here after reviewing the measurements. The figure will always be regenerated from the CSVs, without manual changes to the points.
 
 ## Conclusion
 
-There is currently no evidence from this protocol to choose a kernel. A point lower and further left would be preferable on both outcomes, but faster startup at higher power is a trade-off, not a unique winner. Small or null differences will be reported as such; configuration changes alone are not performance evidence.
+I cannot choose a kernel from this protocol until there are measurements. A point lower and further left would be better on both measures. If a kernel starts Firefox faster but uses more power, the choice will depend on which matters more. I will report small or null differences as they are. The configuration changes alone do not show an improvement.
 
 ## Stated limitations
 
-- One laptop, one worn battery and one planned session per kernel limit generalization.
+- The results will apply to this laptop and its worn battery. One planned session per kernel gives little basis for generalizing to other machines.
 - Ten startup repetitions are few. Consecutive battery readings are not independent sessions, and between-reboot variability is not measured.
-- Thermal state, CPU frequency, background services, Wi-Fi activity and display configuration can affect both outcomes. A settling delay does not prove thermal equilibrium.
+- Temperature, CPU frequency, background services, Wi-Fi activity and display configuration can affect both measurements. A settling delay does not prove that temperature has stabilized.
 - The comparison changes the kernel version from 7.0 to 7.2.9, compiler, configuration and patches together. It cannot attribute a difference to BORE, ThinLTO or RCU alone.
 - The installed Mint baseline includes global tuning and a configured preemption override. It is not a pristine Mint installation.
-- Window visibility is a limited startup endpoint. PID/window matching and process cleanup still need live validation on this Firefox installation.
+- The startup measurement ends at window visibility. Matching the window to the process ID and cleaning up the processes still need to be checked on this Firefox installation.
 - Battery sensors have finite resolution and update intervals; current and voltage are read consecutively. No external wattmeter is used.
-- The analysis is descriptive, with no significance test or uncertainty interval. It does not establish autonomy under real workloads.
+- The analysis reports descriptive statistics, with no significance test or uncertainty interval. It does not establish battery runtime under real workloads.
 
 ## AI-assisted implementation and ownership
 
-AI agents implemented the scripts and helped reconstruct and document the configurations under my direction. I define the research question, protocol and practical choices, and I am responsible for conducting and reviewing the measurements and interpreting the results. The measurements have not yet been performed. AI-generated code and static checks do not substitute for experimental validation.
+AI agents wrote the scripts and helped reconstruct and document the configurations under my direction. The research question, protocol and practical choices are mine. I am responsible for taking and checking the measurements and interpreting the results. I have not taken those measurements yet. The code still needs to be validated through actual runs, regardless of its static checks.
 
 ## Repository map
 
