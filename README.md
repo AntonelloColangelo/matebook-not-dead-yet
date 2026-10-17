@@ -102,15 +102,16 @@ I cannot choose a kernel from this protocol until there are measurements. A poin
 
 AI agents wrote the scripts and helped reconstruct and document the configurations under my direction. The research question, protocol and practical choices are mine. I am responsible for taking and checking the measurements and interpreting the results. I have not taken those measurements yet. Reviewing the code is only a first step. I still need to check it during actual runs.
 
-## Repository map
+## Where to find things
 
-| Path | Purpose |
+| Folder or file | What's inside |
 |---|---|
-| `configs/` | Selected config differences, hashes, sanitized boot parameters and global tuning |
-| `patches/` | Patch references and hashes only; no kernel source code |
-| `scripts/` | Measurement preparation, benchmark and analysis |
-| `results/` | Reserved for completed per-kernel measurement CSVs |
-| `docs/figures/` | Reserved for the figure generated from real data |
-| `docs/build-inventory.md` | Reconstruction of the retained build evidence |
+| `scripts/` | Scripts to run the tests and read the results |
+| `results/` | Test data, once collected |
+| `configs/` | Kernel settings |
+| `patches/` | References for the kernel changes |
+| `docs/` | Build notes and, once data are available, the table and figure |
+| `FASE2.txt` | Step-by-step testing instructions in Italian |
+| `FASE3.txt` | How to read the results, in Italian |
 
 Kernel images, initramfs files, source trees, private keys, browser profiles and build archives are excluded. Files are checked for personal paths, host identifiers and disk UUIDs before publication.
