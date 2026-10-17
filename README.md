@@ -2,19 +2,19 @@
 
 ## Abstract
 
-This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to access the computer that runs my genome analyses remotely. AI agents helped prepare custom kernels and benchmark scripts under my direction. I plan to compare these kernels with the installed Mint kernel by measuring how long Firefox, Claude and Codex take to show a window under CPU load, and how much power the laptop uses at idle. The benchmarks have not been run and remain paused. No results are available yet, so I cannot say whether the custom kernels offer an improvement.
+This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and benchmark scripts under my direction. I plan to compare these kernels with the installed Mint kernel by measuring how long Firefox, Claude and Codex take to show a window under CPU load, and how much power the laptop uses at idle. The benchmarks have not been run and remain paused, so no results are available yet.
 
 ## Introduction
 
-I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling). The analyses run on that other computer, so keeping this laptop responsive would help me continue using it for remote work.
+I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling).
 
-Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. After the changes I had already tried, the kernel seemed like one of the few remaining parts of the system where I could look for further improvements. It manages CPU time and memory, so I thought tuning it for my hardware was worth testing. I used AI agents to help prepare the custom kernels and document the changes. Any benefit still needs to be measured.
+Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. After the changes I had already tried, the kernel seemed like one of the few remaining parts of the system where I could look for further improvements. It manages CPU time and memory, so I thought tuning it for my hardware was worth testing.
 
-I chose Firefox, Claude and Codex for the tests because they are among the applications I use most often. The experiment asks whether the custom kernels make these applications open faster without increasing idle power use.
+I chose Firefox, Claude and Codex for the tests because they are among the applications I use most often.
 
 Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform. It also does not evaluate AI assistance.
 
-**Benchmarks are paused.** There are no measurements for this protocol yet. The planned tests compare Linux kernels on the same laptop. They do not compare Windows with Linux or measure how many extra years the laptop will remain useful.
+The planned tests compare Linux kernels on the same laptop. They do not compare Windows with Linux or measure how many extra years the laptop will remain useful.
 
 ## Methods
 
@@ -42,15 +42,15 @@ The capacity ratio above comes from the hardware inventory. It does not measure 
 | 7.2.9-kpl-reactive | Builds on thinlto, with changes to timing and background kernel work | BORE 6.8.0 |
 | 7.2.9-kpl-reactive2 | Builds on reactive, with less debugging and changes to memory handling | BORE 6.8.0 and TTM beneficial_order |
 
-BORE changes CPU scheduling to favour short bursts of work. The aim is to improve interactive response when tasks compete for CPU time. Whether that makes applications start faster on this laptop remains to be measured.
+BORE changes CPU scheduling to favour short bursts of work. The aim is to improve interactive response when tasks compete for CPU time.
 
 Preemption lets the kernel interrupt some of its current work so another task can run. Full and lazy preemption handle this differently, which may affect response time and CPU work. ThinLTO is a build option that optimizes code across different parts of the kernel.
 
-`rcu_nocbs=all` moves a type of deferred kernel work, called RCU callbacks, to dedicated background threads. The lazy RCU setting allows some of this work to be grouped and delayed. I still need to measure whether this reduces power use here.
+`rcu_nocbs=all` moves a type of deferred kernel work, called RCU callbacks, to dedicated background threads. The lazy RCU setting allows some of this work to be grouped and delayed.
 
-The custom kernels also include fewer drivers and build settings chosen for this CPU. Some features were already present in Mint. The memory settings apply to every kernel, including Mint, so they are not an advantage unique to the custom builds. The detailed settings are recorded in the files linked below.
+The custom kernels also include fewer drivers and build settings chosen for this CPU. Some features were already present in Mint. The memory settings apply to every kernel, including Mint, so they are not an advantage unique to the custom builds.
 
-The [configuration differences](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) record these changes. The experiment compares complete kernel configurations, so it cannot isolate the effect of an individual patch.
+The [configuration differences](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) record these changes.
 
 ### What I will measure
 
@@ -59,7 +59,7 @@ I plan one session per kernel after reboot, with two measurements:
 1. Time 10 launches each of Firefox, Claude desktop and Codex desktop while a fixed background task keeps all eight CPU threads busy. The script uses hyperfine for timing and stress-ng for the background work. Before each launch, it restores the same separate profile for each app and clears cached files from memory. Timing stops when the first app window appears. Preparing the profile and closing the app are not included.
 2. Record battery power every five seconds for ten minutes, giving 120 readings while the laptop is idle. This happens before the CPU load, after a short settling period. The charger stays disconnected, brightness stays fixed, Wi-Fi stays on, and only the terminal remains open.
 
-For Claude and Codex, a visible login or startup window also counts. This does not measure when the chat is ready or a response arrives. The test uses separate profiles without signing in. Profile isolation and window detection still need live checks. On this installation, Codex desktop launches with `chatgpt`, and Claude with `claude-desktop`. Clearing the operating-system cache does not guarantee that the drive's internal cache is empty. Idle power also does not tell us how long the battery will last during daily work.
+For Claude and Codex, a visible login or startup window also counts. This does not measure when the chat is ready or a response arrives. The test uses separate profiles without signing in. On this installation, Codex desktop launches with `chatgpt`, and Claude with `claude-desktop`. Clearing the operating-system cache does not guarantee that the drive's internal cache is empty.
 
 ### Running the scripts later
 
@@ -95,11 +95,11 @@ The script marks missing kernels as *Not measured* and leaves percentage changes
 
 ## Discussion
 
-The practical question is whether these changes make this laptop comfortable enough for me to keep using. Faster application startup would help with one part of that experience. The tests do not cover every daily task, and idle power does not measure battery runtime during work.
+Faster application startup would help with one part of daily use. These tests do not cover every task or measure battery runtime during work.
 
-AI agents helped write scripts and reconstruct the kernel configurations under my direction. That made it possible for me to work through changes that would be difficult to prepare alone. It does not establish that every change is correct or useful. The scripts have been reviewed and checked for syntax, but profile isolation, window detection and cleanup still need checks during actual runs. This project does not compare work done with and without AI.
+AI assistance helped me work through changes that would be difficult to prepare alone. It does not establish that every change is correct or useful. The scripts have been reviewed and checked for syntax, but profile isolation, window detection and cleanup still need checks during actual runs. This project does not compare work done with and without AI.
 
-The experiment compares complete kernel builds. If one performs better, I will not be able to attribute that difference to a single patch or setting. Small or null differences would also be useful: they would help me decide whether maintaining a custom kernel is worth the effort.
+Small or null differences would also help me decide whether maintaining a custom kernel is worth the effort.
 
 ### Stated limitations
 
@@ -109,19 +109,16 @@ The experiment compares complete kernel builds. If one performs better, I will n
 - The apps always run in the same order: Firefox, Claude, then Codex. Each gets the same CPU load and a ten-second wait before timing starts, but the laptop may be warmer for the later apps. Compare each app with itself across kernels.
 - Several things change together, including the kernel version, build tools and settings. A better result would not tell us which change caused it.
 - Mint already has changed memory and preemption settings. It is not a default installation.
-- Timing stops when a window appears, not when the app is fully ready. Window detection and proper app shutdown still need to be checked in real runs.
 - Power readings come from the laptop's battery sensor, not an external meter. The sensor has limited precision and refresh speed, and current and voltage are read one after the other.
-- The analysis summarizes the measurements. It does not test whether small differences are meaningful or calculate a range of uncertainty. Idle power does not tell us how long the battery will last during everyday use.
+- The analysis summarizes the measurements. It does not test whether small differences are meaningful or calculate a range of uncertainty.
 
 ## Conclusion
 
-There is no measured basis yet for choosing a kernel. The next step, when benchmarks resume, is to collect startup times and idle power readings under the same conditions. A kernel that improves both would be a useful candidate for this laptop. If the results are mixed or show little difference, I will report that without claiming an improvement.
-
-The aim remains to keep using the computer I already own. Whether a custom kernel helps enough to justify maintaining it is still an open question.
+There is no measured basis yet for choosing a kernel. Once benchmarks resume, I will look for faster application startup without higher idle power use. If the results are mixed or show little difference, I will report that without claiming an improvement.
 
 ## AI-assisted implementation and ownership
 
-AI agents wrote the scripts and helped reconstruct and document the configurations under my direction. The research question, protocol and practical choices are mine. I am responsible for taking and checking the measurements and interpreting the results. I have not taken those measurements yet. Reviewing the code is only a first step. I still need to check it during actual runs.
+AI agents wrote the scripts and helped reconstruct and document the configurations under my direction. The research question, protocol and practical choices are mine. I am responsible for taking and checking the measurements and interpreting the results.
 
 ## Reference
 
