@@ -1,4 +1,4 @@
-# Keeping an ageing laptop useful with AI-assisted Linux changes
+# Can kernel tuning improve an ageing laptop? An AI-assisted case study
 
 Can software changes help me keep using an ageing laptop instead of buying another one?
 
