@@ -6,7 +6,7 @@ This project explores whether tuning the Linux kernel can help me keep using an 
 
 ## Introduction
 
-I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable.
+I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling). The analyses run on that other computer, so keeping this laptop responsive would help me continue using it for remote work.
 
 Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. After the changes I had already tried, the kernel seemed like one of the few remaining parts of the system where I could look for further improvements. It manages CPU time and memory, so I thought tuning it for my hardware was worth testing. I used AI agents to help prepare the custom kernels and document the changes. Any benefit still needs to be measured.
 
