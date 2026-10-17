@@ -11,7 +11,7 @@ COSA FAREMO
 
 Per ogni kernel misureremo due cose:
 - quanta potenza usa il portatile a riposo, leggendo la batteria;
-- quanto tempo impiega ad apparire la finestra di Firefox mentre la CPU
+- quanto tempo impiega ad apparire la finestra di Firefox, Claude e Codex mentre la CPU
   svolge un altro lavoro.
 
 Useremo una sola sessione per kernel, dopo il riavvio. Ogni riavvio richiederà
@@ -24,7 +24,7 @@ Apri un terminale nella cartella del repository, quella che contiene
 README.md e la cartella scripts. Tutti i comandi qui sotto partono da lì.
 
 Dovremo prima verificare i programmi necessari:
-- Firefox;
+- Firefox, Claude desktop e questa app Codex, avviata qui con il comando chatgpt;
 - hyperfine, per cronometrare gli avvii;
 - stress-ng, per tenere occupata la CPU;
 - xdotool, per riconoscere la finestra di Firefox;
@@ -55,6 +55,29 @@ siti. Poi chiudi normalmente quella finestra.
 Conserva il profilo creato: verrà copiato per ogni avvio e per tutti i kernel.
 Non ripetere questo passaggio se è già riuscito. La cartella del profilo è
 work/profile-base e non deve essere caricata su GitHub.
+
+2B. PREPARA CLAUDE E CODEX UNA SOLA VOLTA
+
+Sempre e solo quando riprenderemo, chiudi completamente Claude e Codex,
+anche dall'area di notifica. Poi, dal terminale del repository, esegui:
+
+    bash scripts/00-electron-profiles.sh
+
+Il comando apre prima Claude, poi Codex, con cartelle di prova separate.
+Non accedere ad account e non aprire progetti. Attendi la prima finestra,
+poi usa Esci dal menu dell'app: la sola chiusura della finestra può lasciarla
+attiva in background. Quando esci da Claude, si apre Codex.
+
+Le cartelle work/claude-profile-base e work/codex-profile-base vengono copiate
+prima di ogni ripetizione. Non cancellarle o pubblicarle. Non usiamo i tuoi
+profili personali e non impostiamo posizione, dimensioni o zoom delle tue
+finestre. La separazione dei profili deve ancora essere verificata dal vivo:
+se appare la sessione personale anziché quella di prova, interrompi e chiedi
+aiuto prima di procedere. Non copiare credenziali nella cartella di prova.
+
+Il comando codex da terminale indica un altro strumento: qui misuriamo l'app
+desktop avviata con chatgpt. Per Claude usiamo claude-desktop, non la pagina
+web aperta in Firefox. Non passiamo opzioni per disattivare la sandbox.
 
 3. PREPARA IL PORTATILE PER OGNI KERNEL
 
@@ -89,16 +112,17 @@ Ecco cosa succederà:
    cioè i file tenuti in memoria che potrebbero rendere un avvio più rapido.
    La password va inserita soltanto nel terminale, non in chat.
 4. Avvia il lavoro di fondo su otto thread della CPU e aspetta dieci secondi.
-5. Apre e chiude Firefox dieci volte. Prima di ogni avvio ripristina il
-   profilo dedicato e svuota la cache del sistema operativo.
+5. Apre e chiude Firefox dieci volte, poi Claude dieci volte e Codex dieci
+   volte. Prima di ogni avvio ripristina il profilo dedicato e svuota la cache.
+   Per ciascuna app riavvia lo stesso carico CPU, con dieci secondi di attesa.
 6. Ferma il lavoro di fondo e salva il file finale se tutto è riuscito.
 
 La lettura della batteria viene prima del lavoro sulla CPU, per evitare
 il calore prodotto da quel lavoro. I due minuti di attesa non garantiscono
 che la temperatura si sia stabilizzata.
 
-Non eseguire a mano i tre script firefox-prepare.sh, firefox-start.sh e
-firefox-stop.sh: lo script principale li richiama quando servono.
+Non eseguire a mano gli script firefox-* o electron-*:
+lo script principale li richiama quando servono.
 
 5. CONTROLLA COSA È STATO SALVATO
 
@@ -107,14 +131,16 @@ Il risultato completo si trova in:
     results/<kernel>.csv
 
 <kernel> indica il nome del kernel appena misurato, non è testo da digitare.
-Un CSV è una tabella di testo. Questo deve contenere 131 righe:
+Un CSV è una tabella di testo. Questo deve contenere 151 righe:
 - una riga con i nomi delle colonne;
 - 120 letture della batteria, chiamate idle_power, in watt;
-- 10 tempi di Firefox, chiamati firefox_startup, in secondi.
+- 10 tempi di Firefox, chiamati firefox_startup, in secondi;
+- 10 tempi di Claude, chiamati claude_startup, in secondi;
+- 10 tempi di Codex, chiamati codex_startup, in secondi.
 
 Lo script mostra già le prime righe e il conteggio finale nel terminale.
 Le colonne elapsed_s riportano quando sono state prese le letture della
-batteria; sono vuote per i tempi di Firefox.
+batteria; sono vuote per i tempi di apertura delle tre app.
 
 In configs/<kernel>.txt trovi il kernel, le versioni dei programmi,
 la luminosità e un codice di controllo del profilo Firefox, chiamato hash.
@@ -130,16 +156,17 @@ SE QUALCOSA SI FERMA
 Non cancellare cartelle e non rilanciare subito la prova. Conserva il
 messaggio del terminale e chiedi aiuto. Lo script non sovrascrive una
 sessione già iniziata: dobbiamo prima capire cosa è successo.
-Il CSV finale viene creato soltanto dopo entrambe le misure.
+Il CSV finale viene creato soltanto dopo la batteria e tutte e tre le app.
 
 Una finestra che non compare entro il tempo previsto o un errore nella
-chiusura di Firefox invalida la prova. Lo stesso vale se il computer va
+chiusura di una delle app invalida la prova. Lo stesso vale se il computer va
 in sospensione o le letture subiscono forti ritardi.
 
 COSA POSSIAMO CONCLUDERE, E COSA NO
 
-Il tempo di Firefox termina quando compare la finestra. Non dimostra che
-il browser sia già completamente pronto. Include anche il piccolo tempo
+Il tempo di ogni app termina quando compare la prima finestra visibile.
+Per Claude e Codex conta anche una finestra di accesso o iniziale. Non misura
+la disponibilità della chat o di una risposta, né richiede un account attivo. Include anche il piccolo tempo
 necessario allo script per rilevarla, ma non quello per preparare il profilo
 o chiudere Firefox. La cache interna del disco non viene svuotata.
 
@@ -153,7 +180,13 @@ Lo script controlla batteria e luminosità durante le letture e prima degli
 avvii. Controlla che il Wi-Fi sia acceso all'inizio e dopo le due serie,
 ma non controlla continuamente il traffico o tutti i programmi in background.
 Devi verificare che la luminosità sia uguale anche fra kernel diversi.
-Il riconoscimento della finestra Firefox deve ancora essere provato dal vivo.
+Il riconoscimento delle finestre e la chiusura delle tre app devono ancora
+essere provati dal vivo. L'ordine resta Firefox, Claude, Codex per ogni kernel:
+le ultime app potrebbero risentire del riscaldamento. Confronta ciascuna app
+con se stessa sugli altri kernel, non i tempi di app diverse fra loro.
+La lettura a riposo della batteria resta unica: non misura il consumo di
+Claude, Codex o Firefox durante l'uso. Nei metadati vengono registrati anche
+i codici di controllo dei binari e dei profili delle due app desktop.
 
 PER APPROFONDIRE
 

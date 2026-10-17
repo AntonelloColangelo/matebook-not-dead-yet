@@ -11,7 +11,7 @@ I file completi delle prove devono trovarsi nella cartella results/,
 uno per kernel. Lo script cerca soltanto i cinque kernel previsti.
 Non usa le misure parziali che si trovano in work/.
 
-Per ogni file servono tutti i 10 tempi di Firefox e le 120 letture della
+Per ogni file servono 10 tempi per ciascuna app, Firefox, Claude e Codex, e le 120 letture della
 batteria. Se un kernel non è stato misurato, può mancare il suo file.
 Se invece il file c'è ma è incompleto o contiene errori, l'analisi si ferma.
 
@@ -44,11 +44,14 @@ Non modificare i punti del grafico a mano: rigeneralo sempre dai CSV.
 
 3. LEGGI LA TABELLA
 
-Per ogni kernel trovi:
-- Il tempo mediano di avvio di Firefox, in secondi. Si ordinano i dieci
+Per ogni coppia kernel/app trovi:
+- Il tempo mediano di apertura dell'app, in secondi. Si ordinano i dieci
   tempi e si fa la media dei due centrali.
 - La potenza media a riposo, in watt. È la media delle 120 letture.
+  È lo stesso valore ripetuto nelle tre righe del kernel, non il consumo
+  della singola app.
 - La differenza percentuale rispetto a Mint 7.0.0-38-generic.
+  I tempi vengono confrontati sempre per la stessa app.
 
 Una percentuale negativa indica un tempo più breve o una potenza più bassa
 rispetto a Mint. Una percentuale positiva indica un valore più alto.
@@ -62,14 +65,18 @@ un altro kernel come riferimento e non inventa i valori mancanti.
 
 4. LEGGI IL GRAFICO
 
-Ogni punto rappresenta un kernel misurato:
-- Più a sinistra significa che Firefox si apre in meno tempo.
+L'unica figura contiene tre riquadri: Firefox, Claude e Codex.
+In ciascun riquadro, ogni punto rappresenta un kernel misurato:
+- Più a sinistra significa che quell'app si apre in meno tempo.
 - Più in basso significa che il portatile usa meno watt a riposo.
 
 Un punto in basso a sinistra è quindi preferibile su entrambe le misure.
 Se un kernel è più veloce ma consuma di più, non c'è un vincitore unico:
 bisogna decidere quale aspetto conta di più per te.
 
+La scala dei watt è comune; quella dei secondi può cambiare fra riquadri.
+La potenza a riposo è la stessa nei tre riquadri, non viene misurata tre volte.
+Non si calcola una media dei tempi delle tre app né un vincitore complessivo.
 I colori e le forme della legenda distinguono i kernel. Entrambi gli assi
 partono da zero. Due punti uguali possono sovrapporsi: non vengono spostati
 per separarli. Un kernel senza misure non compare nel grafico.

@@ -11,7 +11,7 @@ case "$BENCH_KERNEL" in
     7.0.0-38-generic|7.2.9-kpl-efficiency|7.2.9-kpl-thinlto|7.2.9-kpl-reactive|7.2.9-kpl-reactive2) ;;
     *) echo 'Kernel non previsto dal protocollo.' >&2; exit 1 ;;
 esac
-for tool in firefox hyperfine stress-ng xdotool python3 nmcli setsid timeout pgrep sudo; do
+for tool in firefox chatgpt claude-desktop hyperfine stress-ng xdotool python3 nmcli setsid timeout pgrep sudo; do
     command -v "$tool" >/dev/null
 done
 # Il formato JSON è quello di hyperfine 1.x, con --conclude disponibile.
@@ -19,15 +19,17 @@ hyperfine --version | grep -E '^hyperfine 1\.(1[5-9]|[2-9][0-9])\.'
 [ "${XDG_SESSION_TYPE:-}" = x11 ]
 [ "$EUID" -ne 0 ]
 [ -f work/profile-ready ]
-if pgrep -x firefox >/dev/null || pgrep -x stress-ng >/dev/null; then
-    echo 'Chiudi Firefox e ogni stress-ng prima della sessione.' >&2
+[ -f work/claude-profile-ready ]
+[ -f work/codex-profile-ready ]
+if pgrep -x firefox >/dev/null || pgrep -x stress-ng >/dev/null || pgrep -x ChatGPT >/dev/null || pgrep -x claude-desktop >/dev/null; then
+    echo 'Chiudi Firefox, Claude, Codex e ogni stress-ng prima della sessione.' >&2
     exit 1
 fi
 
 # Una sola sessione per kernel; nessuna sovrascrittura automatica.
 mkdir -p work results configs
 mkdir "work/$BENCH_KERNEL"
-mkdir -p "work/$BENCH_KERNEL/idle" "work/$BENCH_KERNEL/firefox"
+mkdir -p "work/$BENCH_KERNEL/idle" "work/$BENCH_KERNEL/firefox" "work/$BENCH_KERNEL/claude" "work/$BENCH_KERNEL/codex"
 [ ! -e "results/$BENCH_KERNEL.csv" ]
 cd "work/$BENCH_KERNEL"
 
@@ -56,6 +58,25 @@ tar \
     -C "$BENCH_ROOT/work" \
     profile-base | sha256sum | cut -d ' ' -f 1 \
     >> "$BENCH_ROOT/configs/$BENCH_KERNEL.txt"
+
+# Identifica i binari senza aprire le app o registrare percorsi personali.
+for BINARY in /usr/lib/chatgpt/ChatGPT /usr/lib/chatgpt/resources/app.asar /usr/lib/claude-desktop/claude-desktop /usr/lib/claude-desktop/resources/app.asar; do
+    printf 'app_binary_sha256=' >> "$BENCH_ROOT/configs/$BENCH_KERNEL.txt"
+    sha256sum "$BINARY" | cut -d ' ' -f 1 >> "$BENCH_ROOT/configs/$BENCH_KERNEL.txt"
+done
+for APP in claude codex; do
+    printf '%s_profile_sha256=' "$APP" >> "$BENCH_ROOT/configs/$BENCH_KERNEL.txt"
+    tar \
+        --sort=name \
+        --mtime=@0 \
+        --owner=0 \
+        --group=0 \
+        --numeric-owner \
+        -cf - \
+        -C "$BENCH_ROOT/work" \
+        "$APP-profile-base" | sha256sum | cut -d ' ' -f 1 \
+        >> "$BENCH_ROOT/configs/$BENCH_KERNEL.txt"
+done
 
 ## CONDIZIONI COMUNI
 # Questo hardware ha una batteria e un controllo di luminosità.
@@ -110,8 +131,21 @@ done
 nmcli radio wifi | grep -qx enabled
 head ../measurements.partial.csv
 
-## FIREFOX — 10 AVVII A FREDDO SOTTO CARICO
-cd ../firefox
+## TRE APP — 10 AVVII A FREDDO PER APP
+# Stesso ordine per ogni kernel; il riscaldamento può influenzare le ultime app.
+for BENCH_APP in firefox claude codex; do
+export BENCH_APP
+cd "$BENCH_ROOT/work/$BENCH_KERNEL/$BENCH_APP"
+if [ "$BENCH_APP" = firefox ]; then
+    BENCH_START="$BENCH_ROOT/scripts/firefox-start.sh"
+    BENCH_PREPARE="$BENCH_ROOT/scripts/firefox-prepare.sh"
+    BENCH_STOP="$BENCH_ROOT/scripts/firefox-stop.sh"
+else
+    BENCH_START="$BENCH_ROOT/scripts/electron-start.sh"
+    BENCH_PREPARE="$BENCH_ROOT/scripts/electron-prepare.sh"
+    BENCH_STOP="$BENCH_ROOT/scripts/electron-stop.sh"
+fi
+export BENCH_START BENCH_PREPARE BENCH_STOP
 # Autenticazione dopo la misura a riposo, prima di avviare il carico.
 sudo -v
 setsid stress-ng \
@@ -121,7 +155,7 @@ setsid stress-ng \
     > stress.log 2>&1 &
 STRESS_PID=$!
 export STRESS_PID
-trap 'STATUS=$?; set +e; bash "$BENCH_ROOT/scripts/firefox-stop.sh"; kill -TERM -- "-$STRESS_PID" 2>/dev/null; wait "$STRESS_PID" 2>/dev/null; exit "$STATUS"' EXIT
+trap 'STATUS=$?; set +e; bash "$BENCH_STOP"; kill -TERM -- "-$STRESS_PID" 2>/dev/null; wait "$STRESS_PID" 2>/dev/null; exit "$STATUS"' EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 sleep 10
@@ -131,10 +165,10 @@ kill -0 "$STRESS_PID"
 hyperfine \
     --runs 10 \
     --shell bash \
-    --prepare 'bash "$BENCH_ROOT/scripts/firefox-prepare.sh"' \
-    --conclude 'bash "$BENCH_ROOT/scripts/firefox-stop.sh"' \
+    --prepare 'bash "$BENCH_PREPARE"' \
+    --conclude 'bash "$BENCH_STOP"' \
     --export-json timings.json \
-    'bash "$BENCH_ROOT/scripts/firefox-start.sh"'
+    'bash "$BENCH_START"'
 
 kill -0 "$STRESS_PID"
 [ "$(pgrep -P "$STRESS_PID" | wc -l)" -eq 8 ]
@@ -145,7 +179,7 @@ kill -TERM -- "-$STRESS_PID"
 wait "$STRESS_PID" || true
 trap - EXIT INT TERM
 
-## CSV UNICO PER KERNEL
+## TEMPI INDIVIDUALI NEL CSV
 # Estrae i tempi individuali: il CSV nativo di hyperfine contiene riepiloghi.
 python3 - <<'PY'
 import csv
@@ -159,13 +193,16 @@ if len(result['times']) != 10 or any(result['exit_codes']):
 with Path('../measurements.partial.csv').open('a', newline='') as handle:
     writer = csv.writer(handle)
     for n, seconds in enumerate(result['times'], 1):
-        writer.writerow([os.environ['BENCH_KERNEL'], 'firefox_startup', n, '', seconds, 's'])
+        writer.writerow([os.environ['BENCH_KERNEL'], os.environ['BENCH_APP'] + '_startup', n, '', seconds, 's'])
 PY
+done
+
+## CSV COMPLETO DOPO LE TRE APP
 cp ../measurements.partial.csv "$BENCH_ROOT/results/$BENCH_KERNEL.csv"
 head "$BENCH_ROOT/results/$BENCH_KERNEL.csv"
 cut -d , -f 2 "$BENCH_ROOT/results/$BENCH_KERNEL.csv" | uniq -c
 wc -l "$BENCH_ROOT/results/$BENCH_KERNEL.csv"
 
-# Attesi: intestazione + 120 campioni di potenza + 10 tempi di avvio.
+# Attesi: intestazione + 120 campioni di potenza + 30 tempi di avvio, 10 per app.
 # Prima del prossimo kernel: controlla i dati e chiedi conferma del riavvio.
 # Non eseguire grub-reboot o reboot automaticamente.

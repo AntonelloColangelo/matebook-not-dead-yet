@@ -44,22 +44,25 @@ The [configuration differences](configs/README.md), [build notes](docs/build-inv
 
 I plan one session per kernel after reboot, with two measurements:
 
-1. Time 10 Firefox launches while a fixed background task keeps all eight CPU threads busy. The script uses hyperfine for timing and stress-ng for the background work. Before each launch, it restores the same separate Firefox profile and clears cached files from memory. Timing stops when the Firefox window appears. Preparing the profile and closing Firefox are not included.
+1. Time 10 launches each of Firefox, Claude desktop and Codex desktop while a fixed background task keeps all eight CPU threads busy. The script uses hyperfine for timing and stress-ng for the background work. Before each launch, it restores the same separate profile for each app and clears cached files from memory. Timing stops when the first app window appears. Preparing the profile and closing the app are not included.
 2. Record battery power every five seconds for ten minutes, giving 120 readings while the laptop is idle. This happens before the CPU load, after a short settling period. The charger stays disconnected, brightness stays fixed, Wi-Fi stays on, and only the terminal remains open.
 
-A visible Firefox window does not necessarily mean the page has finished drawing or the browser is ready to use. Clearing the operating-system cache does not guarantee that the drive's internal cache is empty. Idle power also does not tell us how long the battery will last during daily work.
+For Claude and Codex, a visible login or startup window also counts. This does not measure when the chat is ready or a response arrives. The test uses separate profiles without signing in. Profile isolation and window detection still need live checks. On this installation, Codex desktop launches with `chatgpt`, and Claude with `claude-desktop`. Clearing the operating-system cache does not guarantee that the drive's internal cache is empty. Idle power also does not tell us how long the battery will last during daily work.
 
 ## Running the scripts later
 
 **The tests are still paused. Run these commands only when the measurements resume.** No script changes GRUB or reboots the computer. Each future reboot requires separate confirmation.
 
-The scripts need Firefox, hyperfine, stress-ng, xdotool, Python 3 and NetworkManager. The analysis uses Matplotlib to draw the figure. These tools have not been installed as part of this project. Use hyperfine 1.x, version 1.15 or later within that series; the script does not support version 2.x.
+The scripts need Firefox, Claude desktop, Codex desktop, hyperfine, stress-ng, xdotool, Python 3 and NetworkManager. The analysis uses Matplotlib to draw the figure. These tools have not been installed as part of this project. Use hyperfine 1.x, version 1.15 or later within that series; the script does not support version 2.x.
 
 After resuming, from the repository root:
 
 ```bash
 # Prepare the dedicated profile once; close its window normally.
 bash scripts/00-profile.sh
+
+# With Claude and Codex fully closed, prepare their separate profiles.
+bash scripts/00-electron-profiles.sh
 
 # Run once per kernel, after reboot and manual preparation.
 bash scripts/01-benchmark.sh
@@ -74,18 +77,20 @@ The Bash scripts have Italian comments and a linear layout. [Phase 2 instruction
 
 There are no measurement CSVs, numerical results or generated figures yet. This repository does not include earlier measurements made with other protocols.
 
-Once measurements are available, the analysis script will produce one table in `docs/results-summary.md` and one scatter plot in `docs/figures/kernel-tradeoff.png`. The table reports median startup time in seconds, mean idle power in watts and percentage changes relative to Mint. The plot has startup time on the x-axis and power on the y-axis, with one point per measured kernel.
+Once measurements are available, the analysis script will produce one table in `docs/results-summary.md` and one scatter plot in `docs/figures/kernel-tradeoff.png`. The table reports median startup time in seconds, mean idle power in watts and percentage changes relative to Mint. The table has a row for each kernel and app, comparing startup times with the same app on Mint. The single figure has three panels, one per app, with startup time on x and idle power on y. Each panel has one point per measured kernel. The idle-power value is shared across the three panels; it is not the power consumed by each app. There is no combined startup score.
 
 The script marks missing kernels as *Not measured* and leaves percentage changes unavailable if Mint has not been measured. It does not fill gaps with zeros or estimates. I will add the generated table and figure here after reviewing the measurements. The figure will always be regenerated from the CSVs, without manual changes to the points.
 
 ## Conclusion
 
-I cannot choose a kernel from this protocol until there are measurements. A point lower and further left would be better on both measures. If a kernel starts Firefox faster but uses more power, the choice will depend on which matters more. I will report small or null differences as they are. The configuration changes alone do not show an improvement.
+I cannot choose a kernel from this protocol until there are measurements. A point lower and further left would be better on both measures. If a kernel opens an app faster but uses more idle power, the choice will depend on which matters more. I will report small or null differences as they are. The configuration changes alone do not show an improvement.
 
 ## Stated limitations
 
+- Apps run in a fixed order, Firefox, Claude, then Codex. Later tests may be affected by warming. Each app gets the same CPU load and ten-second lead-in. Compare each app across kernels, not different apps against one another.
+
 - The results will apply to this laptop and its worn battery. One planned session per kernel gives little basis for generalizing to other machines.
-- Ten startup repetitions are few. Consecutive battery readings are not independent sessions, and between-reboot variability is not measured.
+- Ten startup repetitions per app are few. Consecutive battery readings are not independent sessions, and between-reboot variability is not measured.
 - Temperature, CPU frequency, background services, Wi-Fi activity and display configuration can affect both measurements. A settling delay does not prove that temperature has stabilized.
 - The comparison changes the kernel version from 7.0 to 7.2.9, compiler, configuration and patches together. It cannot attribute a difference to BORE, ThinLTO or RCU alone.
 - Mint uses the laptop's existing memory settings and a changed preemption setting. It is not an untouched default installation.
