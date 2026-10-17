@@ -1,137 +1,173 @@
-FASE 2 — SCRIPT PREPARATI, MISURE NON ESEGUITE
+FASE 2: COME RACCOGLIERE LE MISURE
 
-Questo pacchetto contiene soltanto la preparazione della fase 2.
-Non contiene risultati, analisi o conclusioni sulle prestazioni.
+LE PROVE SONO ANCORA SOSPESE
 
-FILE
+Queste istruzioni servono per quando decideremo di riprendere.
+Non eseguire ora i comandi. Gli script sono stati controllati nel testo
+e nella sintassi, ma non ancora provati sul portatile.
+Non ci sono risultati disponibili.
 
-scripts/00-profile.sh: prepara una volta il profilo Firefox dedicato.
-scripts/01-benchmark.sh: una sessione completa per kernel dopo il riavvio.
-scripts/firefox-prepare.sh: controlli, copia del profilo e cache fredda.
-scripts/firefox-start.sh: avvio fino alla prima finestra Firefox visibile.
-scripts/firefox-stop.sh: chiusura dei soli processi Firefox della prova.
+COSA FAREMO
 
-I tre script firefox-* vengono chiamati da hyperfine, non a mano.
-Sono separati per lasciare preparazione e chiusura fuori dal cronometro.
-Non ci sono funzioni wrapper.
+Per ogni kernel misureremo due cose:
+- quanta potenza usa il portatile a riposo, leggendo la batteria;
+- quanto tempo impiega ad apparire la finestra di Firefox mentre la CPU
+  svolge un altro lavoro.
 
-PREREQUISITI DA RISOLVERE QUANDO RIPRENDEREMO LE PROVE
+Useremo una sola sessione per kernel, dopo il riavvio. Ogni riavvio richiederà
+la tua conferma. Gli script non cambiano il menu di avvio e non riavviano
+il computer. La voce di avvio del kernel Mint va ancora verificata.
 
-Linux Mint con sessione X11, terminale avviato dall'utente normale,
-Firefox, hyperfine 1.15–1.x, stress-ng, xdotool, Python 3, NetworkManager,
-util-linux, procps e strumenti GNU standard. Hyperfine 2.x non è accettato:
-ha un formato JSON diverso; non adattarlo silenziosamente fra due kernel.
-Le versioni dei programmi devono restare uguali in tutte le sessioni.
+1. PRIMA DI COMINCIARE, QUANDO RIPRENDEREMO
 
-Servono privilegi sudo soltanto per svuotare la cache. Non avviare l'intero
-script con sudo. Gli script non installano pacchetti né cambiano sysctl,
-governor, luminosità, schermi, configurazione GRUB o alimentazione.
+Apri un terminale nella cartella del repository, quella che contiene
+README.md e la cartella scripts. Tutti i comandi qui sotto partono da lì.
 
-PROFILO — PRIMA DELLA CAMPAGNA, NON ORA
+Dovremo prima verificare i programmi necessari:
+- Firefox;
+- hyperfine, per cronometrare gli avvii;
+- stress-ng, per tenere occupata la CPU;
+- xdotool, per riconoscere la finestra di Firefox;
+- Python 3 e NetworkManager, oltre ai normali strumenti Linux.
 
-Dalla cartella di questo pacchetto:
+Serve una sessione grafica X11. Per controllare quale usi, il comando è:
+
+    echo "$XDG_SESSION_TYPE"
+
+La risposta attesa è x11. Se è diversa, fermati e chiedi aiuto.
+Hyperfine deve essere della serie 1.x, dalla versione 1.15 in poi.
+La versione 2.x non è supportata. Non cambiare versioni dei programmi
+fra una prova e l'altra. Non abbiamo installato strumenti in questa fase.
+
+2. PREPARA FIREFOX UNA SOLA VOLTA
+
+Questo passaggio crea un profilo separato, cioè un insieme di impostazioni
+riservato alla prova. Non usa il tuo profilo personale.
+
+Chiudi tutte le finestre di Firefox, poi esegui:
 
     bash scripts/00-profile.sh
 
-Chiudi prima ogni Firefox personale. Attendi about:blank, completa eventuali
-schermate iniziali, poi chiudi il Firefox dedicato normalmente. Il profilo
-di riferimento resta in work/profile-base e viene riutilizzato per tutti
-i kernel. Non effettuare login e non visitare siti in questo profilo.
-Ogni ripetizione ne riceve una copia separata, evitando di confrontare
-un primo avvio con un profilo progressivamente modificato dalle prove.
-Il suo hash viene registrato nei metadati, dopo le versioni degli strumenti.
+Si aprirà Firefox. Attendi la pagina vuota, indicata come about:blank.
+Completa eventuali schermate iniziali, senza accedere ad account o visitare
+siti. Poi chiudi normalmente quella finestra.
 
-SESSIONE PER KERNEL — SOLO QUANDO RIATTIVEREMO LE PROVE
+Conserva il profilo creato: verrà copiato per ogni avvio e per tutti i kernel.
+Non ripetere questo passaggio se è già riuscito. La cartella del profilo è
+work/profile-base e non deve essere caricata su GitHub.
+
+3. PREPARA IL PORTATILE PER OGNI KERNEL
+
+Prima della misura:
+- Chiudi gli altri programmi, compreso Codex/ChatGPT. Lascia solo il terminale.
+- Ferma download, aggiornamenti e altri lavori.
+- Scollega l'alimentatore e lascia il Wi-Fi acceso.
+- Usa la stessa luminosità e gli stessi schermi collegati in tutte le prove.
+- Disattiva temporaneamente oscuramento dello schermo e sospensione automatica.
+  Annota come erano impostati, così potrai ripristinarli alla fine.
+- Lascia raffreddare il portatile se ha appena svolto lavori pesanti.
+
+Gli script non regolano questi aspetti al posto tuo. Non spostano né
+ridimensionano ChatGPT e non cambiano le impostazioni del kernel.
+
+4. AVVIA UNA SESSIONE
+
+Quando saremo pronti a misurare, esegui:
 
     bash scripts/01-benchmark.sh
 
-Chiudi tutti i programmi, compreso Codex/ChatGPT, lasciando soltanto il
-terminale. Ferma download, aggiornamenti e altri lavori. Mantieni lo stesso
-assetto degli schermi: lo script non sposta o ridimensiona ChatGPT.
-Scollega l'alimentatore, lascia Wi-Fi acceso e usa la stessa luminosità
-in tutte le sessioni. Disabilita manualmente oscuramento e sospensione
-per la durata della prova, annotando le impostazioni per ripristinarle.
-Attendi che il portatile si raffreddi prima di confermare MISURA.
+Non aggiungere sudo davanti al comando.
+Lo script chiederà se le condizioni sono pronte. Scrivi MISURA e premi Invio
+solo dopo aver completato la preparazione. Da quel momento lascia lavorare
+il computer senza usarlo.
 
-1. Lo script registra kernel, cmdline filtrata, versioni, hash del profilo,
-   luminosità e sorgente della lettura della batteria.
-2. Dopo 120 secondi di assestamento, acquisisce 120 campioni di potenza
-   a scadenze di 5 secondi, dal secondo 5 al secondo 600.
-3. Chiede sudo, avvia stress-ng --cpu 8 --cpu-method int64, attende
-   10 secondi e avvia le 10 ripetizioni hyperfine senza warmup.
-4. Prima di ciascuna ripetizione copia il profilo e svuota page cache,
-   dentries e inode con sync e drop_caches=3. Controlla gli otto worker.
-5. Chiude il Firefox di prova dopo ogni misura e termina il carico alla fine.
+Ecco cosa succederà:
+1. Registra il kernel e le impostazioni utili al confronto.
+2. Aspetta due minuti, poi legge la potenza della batteria ogni cinque
+   secondi per dieci minuti. Sono 120 letture.
+3. Può chiederti la password sudo nel terminale per svuotare la cache,
+   cioè i file tenuti in memoria che potrebbero rendere un avvio più rapido.
+   La password va inserita soltanto nel terminale, non in chat.
+4. Avvia il lavoro di fondo su otto thread della CPU e aspetta dieci secondi.
+5. Apre e chiude Firefox dieci volte. Prima di ogni avvio ripristina il
+   profilo dedicato e svuota la cache del sistema operativo.
+6. Ferma il lavoro di fondo e salva il file finale se tutto è riuscito.
 
-La batteria viene misurata prima del carico per evitare il suo calore residuo.
-I due minuti non certificano equilibrio termico. Il raffreddamento iniziale
-e le condizioni di contorno restano responsabilità di chi conduce la prova.
+La lettura della batteria viene prima del lavoro sulla CPU, per evitare
+il calore prodotto da quel lavoro. I due minuti di attesa non garantiscono
+che la temperatura si sia stabilizzata.
 
-DEFINIZIONI DELLE DUE MISURE
+Non eseguire a mano i tre script firefox-prepare.sh, firefox-start.sh e
+firefox-stop.sh: lo script principale li richiama quando servono.
 
-Reattività: secondi fino al rilevamento di una finestra Firefox visibile
-su X11, appartenente al PID avviato, con pagina about:blank. Include il
-piccolo overhead del helper Bash e del rilevamento xdotool. Non misura
-completo rendering, interattività o caricamento di una pagina web.
-La cache del sistema operativo viene svuotata; non quella interna del disco.
-La chiusura dei processi non entra nel tempo misurato.
+5. CONTROLLA COSA È STATO SALVATO
 
-Potenza a riposo: power_now / 10^6 oppure current_now * voltage_now / 10^12,
-in watt. Le letture corrente/tensione sono consecutive, non atomiche.
-Sono letture del sensore batteria, non misure con un wattmetro esterno.
-Campionamento, terminale e servizi di sistema introducono un piccolo carico.
-Il risultato non è una misura diretta dell'autonomia nell'uso quotidiano.
+Il risultato completo si trova in:
 
-OUTPUT E CONTROLLO VISIVO
+    results/<kernel>.csv
 
-results/<kernel>.csv contiene:
+<kernel> indica il nome del kernel appena misurato, non è testo da digitare.
+Un CSV è una tabella di testo. Questo deve contenere 131 righe:
+- una riga con i nomi delle colonne;
+- 120 letture della batteria, chiamate idle_power, in watt;
+- 10 tempi di Firefox, chiamati firefox_startup, in secondi.
 
-    kernel,metric,replicate,elapsed_s,value,unit
+Lo script mostra già le prime righe e il conteggio finale nel terminale.
+Le colonne elapsed_s riportano quando sono state prese le letture della
+batteria; sono vuote per i tempi di Firefox.
 
-metric=idle_power: 120 valori in W e tempi effettivi di campionamento.
-metric=firefox_startup: 10 tempi individuali in s; elapsed_s vuoto.
-Il file completo ha 131 righe, compresa l'intestazione. Head, uniq -c e
-wc -l sono già eseguiti alla fine. Controlla gli intervalli effettivi dei
-campioni: un sistema sospeso o fortemente ritardato invalida la sessione.
+In configs/<kernel>.txt trovi il kernel, le versioni dei programmi,
+la luminosità e un codice di controllo del profilo Firefox, chiamato hash.
+Quest'ultimo serve per verificare che il profilo sia rimasto lo stesso.
+I parametri di avvio vengono filtrati per escludere percorsi e identificativi
+dei dischi. Il file dichiara quanti parametri sono stati omessi.
 
-configs/<kernel>.txt conserva i metadati. La cmdline viene letta all'inizio,
-ma pubblicata solo con una lista ammessa di parametri; il numero di token
-omessi è dichiarato. Non viene salvata la cmdline integrale con UUID/percorsi.
-Se altri parametri prestazionali sono necessari, il filtro va aggiornato
-esplicitamente e nello stesso modo per tutta la campagna.
+La cartella work/ contiene i file di lavoro e le informazioni sugli errori.
+Non caricarla su GitHub, nemmeno nel repository privato.
 
-work/ contiene profili, log Firefox/stress-ng, JSON hyperfine e CSV parziale.
-È esclusa da Git: non pubblicarla, nemmeno in un repository privato.
-Il CSV finale compare solo dopo il completamento di entrambe le misure.
-Se la sessione fallisce, la cartella resta per l'ispezione e una nuova
-esecuzione si ferma: non elimina né sovrascrive automaticamente le prove.
+SE QUALCOSA SI FERMA
 
-LIMITI E CONTROLLI MANUALI
+Non cancellare cartelle e non rilanciare subito la prova. Conserva il
+messaggio del terminale e chiedi aiuto. Lo script non sovrascrive una
+sessione già iniziata: dobbiamo prima capire cosa è successo.
+Il CSV finale viene creato soltanto dopo entrambe le misure.
 
-Lo script verifica batteria e luminosità a ogni campione e prima di ogni
-avvio Firefox. Verifica Wi-Fi all'inizio e dopo le due serie, non monitora
-continuamente traffico o connessione. Non garantisce l'assenza di servizi
-in background. La luminosità viene conservata, non imposta automaticamente:
-devi confrontare il valore registrato fra i kernel.
+Una finestra che non compare entro il tempo previsto o un errore nella
+chiusura di Firefox invalida la prova. Lo stesso vale se il computer va
+in sospensione o le letture subiscono forti ritardi.
 
-Un timeout della finestra o un errore di chiusura invalida la sessione.
-Su questo Firefox il collegamento PID/finestra resta da verificare dal vivo.
-Un controllo di sintassi non dimostra che il benchmark funzioni sull'hardware.
+COSA POSSIAMO CONCLUDERE, E COSA NO
 
-Gli script non effettuano grub-reboot né reboot. L'ID della voce Mint deve
-ancora essere verificato. Ogni riavvio sarà proposto separatamente e richiederà
-conferma esplicita; non viene impostato alcun avvio futuro in questa fase.
+Il tempo di Firefox termina quando compare la finestra. Non dimostra che
+il browser sia già completamente pronto. Include anche il piccolo tempo
+necessario allo script per rilevarla, ma non quello per preparare il profilo
+o chiudere Firefox. La cache interna del disco non viene svuotata.
 
-RIFERIMENTI DEL PROTOCOLLO
+I watt provengono dai sensori della batteria, non da uno strumento esterno.
+Lo script legge power_now oppure moltiplica corrente e tensione, lette una
+dopo l'altra, convertendo il risultato in watt. Le letture e il terminale
+aggiungono un piccolo carico. Non stiamo misurando direttamente quante ore
+duri la batteria nell'uso quotidiano.
 
-Hyperfine 1.19: --prepare prima di ogni ripetizione, --conclude dopo ciascuna;
-JSON per i tempi individuali, CSV nativo per le statistiche riassuntive:
+Lo script controlla batteria e luminosità durante le letture e prima degli
+avvii. Controlla che il Wi-Fi sia acceso all'inizio e dopo le due serie,
+ma non controlla continuamente il traffico o tutti i programmi in background.
+Devi verificare che la luminosità sia uguale anche fra kernel diversi.
+Il riconoscimento della finestra Firefox deve ancora essere provato dal vivo.
+
+PER APPROFONDIRE
+
+Il comando di carico è stress-ng --cpu 8 --cpu-method int64.
+La preparazione svuota la cache con sync e drop_caches=3.
+I dettagli restano negli script; non occorre modificarli per seguire la guida.
+
+Documentazione di hyperfine:
 https://github.com/sharkdp/hyperfine/blob/v1.19.0/doc/hyperfine.1
 
-xdotool: --sync, --onlyvisible e filtro PID su X11:
+Documentazione di xdotool:
 https://github.com/jordansissel/xdotool
 
-PROSSIMO PASSO
+PASSO SUCCESSIVO
 
-Revisione degli script con l'utente. Nessuna prova è autorizzata ora.
-L'analisi Python e il repository GitHub appartengono alle fasi successive.
+Le prove restano sospese finché non deciderai di riprenderle.
+Dopo aver raccolto i dati, segui FASE3.txt per creare tabella e figura.
