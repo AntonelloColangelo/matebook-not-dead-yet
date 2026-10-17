@@ -6,7 +6,9 @@ Can software changes help me keep using an ageing laptop instead of buying anoth
 
 I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable.
 
-Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. I then wanted to see whether tuning the Linux kernel for the hardware I already have could improve it further, with help from AI agents to prepare the custom kernels and document the changes. I chose Firefox, Claude and Codex for the tests because they are among the applications I use most often. The experiment asks whether the custom kernels make these applications open faster without increasing idle power use.
+Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. After the changes I had already tried, the kernel seemed like one of the few remaining parts of the system where I could look for further improvements. It manages CPU time and memory, so I thought tuning it for my hardware was worth testing. I used AI agents to help prepare the custom kernels and document the changes. Any benefit still needs to be measured.
+
+I chose Firefox, Claude and Codex for the tests because they are among the applications I use most often. The experiment asks whether the custom kernels make these applications open faster without increasing idle power use.
 
 Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform. It also does not evaluate AI assistance.
 
