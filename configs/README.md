@@ -8,4 +8,4 @@ The selection covers scheduling, preemption, tick frequency, RCU, compiler/LTO, 
 
 `boot-parameters.tsv` distinguishes configured entries from the live observation. The generated Mint boot entry and its GRUB ID remain unverified because the protected GRUB file could not be read. The other IDs were read from `custom.cfg`. Identifying boot paths and disk parameters are omitted.
 
-`sysctl.txt` records shared memory tuning and crash settings observed in phase 1. These are not per-kernel changes. The benchmark records additional sanitized metadata here only when actually run.
+`sysctl.txt` records shared memory tuning and crash settings observed in phase 1. These are not per-kernel changes.

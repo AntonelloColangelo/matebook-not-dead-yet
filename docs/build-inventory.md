@@ -17,4 +17,4 @@ Historical reports record successful compilation, signed images/modules and VM c
 
 Some original notes described thinlto with lazy preemption. The later `custom.cfg` entry overrides it with `preempt=full`; the boot-parameter inventory takes precedence over older prose. Only reactive2 was live during phase 1. Other runtime states still require verification at their next boot.
 
-The configuration changes are intentional candidates for testing, not established improvements. No previous benchmark data have been relabelled as results of the current two-measure protocol.
+The configuration changes reflect the choices made for this laptop. Their performance benefits have not been established.
