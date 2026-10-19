@@ -2,13 +2,15 @@
 
 ## Project overview
 
-This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and document their configurations under my direction. This repository contains configuration differences, build notes and patch references.. These observations are anecdotal.
+This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and document their configurations under my direction. This repository contains configuration differences, build notes and patch references. It also records my perception of less stuttering and better responsiveness with reactive2 than with the Mint kernel. These observations are anecdotal.
 
 ## Why I worked on this
 
 I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling).
 
 After moving from Windows 10 to Linux Mint, I explored kernel configurations for this hardware. I wanted to understand which scheduling, memory and build settings I could change.
+
+Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform.
 
 This case study documents kernel changes on one laptop. It does not establish a measured advantage over Windows or show how many extra years the laptop will remain useful.
 
@@ -31,6 +33,8 @@ The battery figure describes its condition, not how long it lasts on a charge.
 
 ### Kernel configurations
 
+![Evolution from efficiency to thinlto, reactive and reactive2, with selected configuration changes. Arrows show build lineage, not performance gains.](docs/figures/kernel-evolution.svg)
+
 The project documents four custom kernels based on Linux 7.2.9 alongside the installed Mint kernel:
 
 | Kernel | Main changes |
@@ -48,6 +52,8 @@ The recorded Mint boot defaults also select full preemption. The shared `sysctl`
 
 ## Personal observations
 
+![Anecdotal comparison with Mint 7.0: reactive2 feels more immediate and responsive, with less stuttering during application use and when several programs are open.](docs/figures/personal-observations.svg)
+
 In everyday use, the laptop feels more immediate and responsive with `7.2.9-kpl-reactive2` than with the original Linux Mint `7.0.0-38-generic` kernel. I notice less stuttering when using applications and when opening several programs. The difference is particularly noticeable when multiple applications are open at the same time.
 
 These are anecdotal observations from my use of this laptop. They describe a perceived improvement, without quantifying it or establishing which kernel change caused it. The Mint kernel was the distribution-provided build, with the local system settings documented in this repository.
@@ -64,6 +70,9 @@ The technical files reconstruct earlier builds from retained scripts, configurat
 
 AI agents helped reconstruct and document the configurations under my direction. The project question and practical choices are mine. I am responsible for checking the evidence and interpreting the observations. AI assistance does not establish that every change is correct or useful.
 
+## Reference
+
+[1] Viduka, D., Kraguljac, V., & Đurašković, J. (2021). *Analysis of the Use Value of Old Hardware Using Open Source Software*. Zbornik Veleučilišta u Rijeci, 9(1), 315–328. [Article and PDF](https://hrcak.srce.hr/257663). DOI: [10.31784/zvr.9.1.19](https://doi.org/10.31784/zvr.9.1.19).
 
 ## Where to find things
 
@@ -71,6 +80,6 @@ AI agents helped reconstruct and document the configurations under my direction.
 |---|---|
 | `configs/` | Kernel settings |
 | `patches/` | References for the kernel changes |
-| `docs/` | Build notes |
+| `docs/` | Build notes and SVG diagrams in `docs/figures/` |
 
 Kernel images, initramfs files, source trees, private keys and build archives are excluded. The published inventory omits personal paths, host identifiers and disk UUIDs.
