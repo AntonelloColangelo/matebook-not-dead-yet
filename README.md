@@ -10,8 +10,6 @@ I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 wi
 
 After moving from Windows 10 to Linux Mint (which was a big improvement), I explored kernel configurations for this hardware. I wanted to understand which scheduling, memory and build settings I could change.
 
-Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform.
-
 This case study documents kernel changes on one laptop. It does not establish a measured advantage over Windows or show how many extra years the laptop will remain useful.
 
 ## Documented setup
@@ -69,10 +67,6 @@ The technical files reconstruct earlier builds from retained scripts, configurat
 ## AI-assisted implementation and ownership
 
 AI agents helped reconstruct and document the configurations under my direction. The project question and practical choices are mine. I am responsible for checking the evidence and interpreting the observations. AI assistance does not establish that every change is correct or useful.
-
-## Reference
-
-[1] Viduka, D., Kraguljac, V., & Đurašković, J. (2021). *Analysis of the Use Value of Old Hardware Using Open Source Software*. Zbornik Veleučilišta u Rijeci, 9(1), 315–328. [Article and PDF](https://hrcak.srce.hr/257663). DOI: [10.31784/zvr.9.1.19](https://doi.org/10.31784/zvr.9.1.19).
 
 ## Where to find things
 
