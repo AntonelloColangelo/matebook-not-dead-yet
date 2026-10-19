@@ -1,4 +1,4 @@
-# Linux kernel tuning on an ageing laptop: an AI-assisted case study
+# Linux kernel tuning on an old laptop: an AI-assisted case study
 
 ## Project overview
 
