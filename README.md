@@ -2,7 +2,7 @@
 
 ## Project overview
 
-This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and document their configurations under my direction. This repository contains configuration differences, build notes and patch references. It records the work done on this laptop without claiming a measured performance advantage.
+This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and document their configurations under my direction. This repository contains configuration differences, build notes and patch references. It also records my perception of less stuttering and better responsiveness with reactive2 than with the Mint kernel. These observations are anecdotal.
 
 ## Why I worked on this
 
@@ -50,9 +50,11 @@ The recorded Mint boot defaults also select full preemption. The shared `sysctl`
 
 ## Personal observations
 
-Moving from Windows 10 to Linux Mint made the laptop more comfortable for me to use. This is an anecdotal observation about the operating-system change. It does not isolate the effect of the custom kernels.
+In everyday use, the laptop feels more immediate and responsive with `7.2.9-kpl-reactive2` than with the original Linux Mint `7.0.0-38-generic` kernel. I notice less stuttering when using applications and when opening several programs. The difference is particularly noticeable when multiple applications are open at the same time.
 
-The repository documents the kernel work, but does not establish that one configuration is faster, uses less power or extends battery life.
+These are anecdotal observations from my use of this laptop. They describe a perceived improvement, without quantifying it or establishing which kernel change caused it. The Mint kernel was the distribution-provided build, with the local system settings documented in this repository.
+
+I have not established lower power consumption or longer battery life.
 
 ## Scope and limitations
 
