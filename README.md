@@ -46,7 +46,7 @@ The table summarizes the recorded changes between custom builds. The `.diff` fil
 
 Build settings and boot parameters describe different parts of the setup. For example, the recorded thinlto boot entry selects `preempt=full`, overriding the lazy-preemption default described in older build notes. Only reactive2 was running when the inventory was collected.
 
-The recorded Mint boot defaults also select full preemption. The shared `sysctl` settings apply across kernels, while build options such as the default zram compressor differ. The [configuration inventory](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) explain these distinctions.
+The Mint boot defaults in GRUB also set `preempt=full`, but the generated Mint boot entry was not verified. The shared `sysctl` settings apply across kernels, while build options such as the default zram compressor differ. The [configuration inventory](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) explain these distinctions.
 
 ## Personal observations
 
