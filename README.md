@@ -1,22 +1,24 @@
-# Can kernel tuning improve an ageing laptop? An AI-assisted case study
+# Linux kernel tuning on an ageing laptop: an AI-assisted case study
 
-## Abstract
+## Project overview
 
-This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and document their configurations under my direction. The everyday usability observations reported here are anecdotal and do not establish a performance advantage from kernel tuning.
+This project explores whether tuning the Linux kernel can help me keep using an ageing Huawei MateBook 14 instead of buying a replacement. I also use it to connect remotely to the computer that runs my genome analyses. AI agents helped prepare custom kernels and document their configurations under my direction. This repository contains configuration differences, build notes and patch references. It records the work done on this laptop without claiming a measured performance advantage.
 
-## Introduction
+## Why I worked on this
 
 I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling).
 
-Moving from Windows 10 to Linux Mint already made the laptop much more comfortable for me to use. This is my experience, rather than a measured comparison between the two systems. After the changes I had already tried, the kernel seemed like one of the few remaining parts of the system where I could look for further improvements. It manages CPU time and memory, so I explored configurations for my hardware.
+After moving from Windows 10 to Linux Mint, I explored kernel configurations for this hardware. I wanted to understand which scheduling, memory and build settings I could change.
 
-Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform. It also does not evaluate AI assistance.
+Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform.
 
 This case study documents kernel changes on one laptop. It does not establish a measured advantage over Windows or show how many extra years the laptop will remain useful.
 
-## Methods
+## Documented setup
 
 ### Hardware
+
+These details come from the inventory used to prepare this repository. They describe that recorded setup, not a continuously updated system report.
 
 | Component | Setup |
 |---|---|
@@ -25,7 +27,7 @@ This case study documents kernel changes on one laptop. It does not establish a 
 | RAM | 8 GB installed; approximately 6.7 GiB usable |
 | Operating system | Linux Mint 22.3 |
 | Battery | Recorded full-charge capacity was 80.3% of its original design capacity |
-| Reference kernel | Mint `7.0.0-38-generic`, with the laptop's existing settings |
+| Installed Mint kernel | Mint `7.0.0-38-generic`, with the laptop's existing settings |
 
 The battery figure describes its condition, not how long it lasts on a charge.
 
@@ -36,39 +38,31 @@ The project documents four custom kernels based on Linux 7.2.9 alongside the ins
 | Kernel | Main changes |
 |---|---|
 | kpl-efficiency | Lazy preemption and build settings chosen for this CPU |
-| kpl-thinlto | BORE scheduling, ThinLTO build optimization and full preemption |
-| kpl-reactive | Based on thinlto, with changes to timing and background kernel work |
-| kpl-reactive2 | Based on reactive, with less debugging and changes to memory handling |
+| kpl-thinlto | BORE 6.8.0, ThinLTO and full preemption configured at boot |
+| kpl-reactive | Based on thinlto, with full preemption in the build configuration, HZ1000, ORC unwinding and RCU boot settings |
+| kpl-reactive2 | Based on reactive, with ACPI debugging disabled, ZRAM_MULTI_COMP enabled and the TTM beneficial_order patch |
 
-BORE gives priority to short bursts of CPU work. Preemption lets the kernel interrupt its work so another task can run. ThinLTO optimizes code when the kernel is built. The RCU settings change how some background kernel work is handled and delayed.
+The table summarizes the recorded changes between custom builds. The `.diff` files instead compare each custom configuration with Mint. A setting inherited from an earlier custom build may therefore appear in several diffs.
 
-Mint already has changed preemption settings, and the same memory settings apply to every kernel. The [configuration differences](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) contain the exact options and patch versions.
+Build settings and boot parameters describe different parts of the setup. For example, the recorded thinlto boot entry selects `preempt=full`, overriding the lazy-preemption default described in older build notes. Only reactive2 was running when the inventory was collected.
 
-## Results
+The recorded Mint boot defaults also select full preemption. The shared `sysctl` settings apply across kernels, while build options such as the default zram compressor differ. The [configuration inventory](configs/README.md), [build notes](docs/build-inventory.md) and [patch references](patches/README.md) explain these distinctions.
 
-The observations about everyday usability in this case study are **anecdotal**: they reflect my experience on one laptop, without a controlled comparison. They do not quantify a speedup, demonstrate longer battery life or isolate the effect of a particular kernel change.
+## Personal observations
 
-## Discussion
+Moving from Windows 10 to Linux Mint made the laptop more comfortable for me to use. This is an anecdotal observation about the operating-system change. It does not isolate the effect of the custom kernels.
 
-AI assistance helped me prepare and document the kernel changes. It does not establish that every change is correct or useful. This project does not compare work done with and without AI.
+The repository documents the kernel work, but does not establish that one configuration is faster, uses less power or extends battery life.
 
-A controlled comparison would be needed to decide whether maintaining a custom kernel offers a measurable benefit on this laptop.
+## Scope and limitations
 
-### Stated limitations
+This is a personal case study on one laptop. Kernel versions, compilers, patches and settings changed together, so the records do not establish the effect of an individual change. Mint also had local system settings and was not a default installation.
 
-- Personal impressions of usability are anecdotal and cannot substitute for controlled performance measurements.
-- This is one laptop with a worn battery. Other computers may give different results.
-- Heat, CPU speed, background programs, Wi-Fi and screen settings can affect performance and power use.
-- Several things change together, including the kernel version, build tools and settings. A better result would not tell us which change caused it.
-- Mint already has changed memory and preemption settings. It is not a default installation.
-
-## Conclusion
-
-This repository documents the kernel changes and my anecdotal experience of using the laptop. Performance gains, lower power use and longer battery life have not been demonstrated.
+The technical files reconstruct earlier builds from retained scripts, configurations and manifests. They distinguish recorded settings from runtime observations. The selected configuration diffs and command summaries are not complete rebuild instructions, and the recorded source URLs have not been independently revalidated.
 
 ## AI-assisted implementation and ownership
 
-AI agents helped reconstruct and document the configurations under my direction. The project question and practical choices are mine. I am responsible for checking the evidence and interpreting the observations.
+AI agents helped reconstruct and document the configurations under my direction. The project question and practical choices are mine. I am responsible for checking the evidence and interpreting the observations. AI assistance does not establish that every change is correct or useful.
 
 ## Reference
 
@@ -82,4 +76,4 @@ AI agents helped reconstruct and document the configurations under my direction.
 | `patches/` | References for the kernel changes |
 | `docs/` | Build notes |
 
-Kernel images, initramfs files, source trees, private keys and build archives are excluded. Files are checked for personal paths, host identifiers and disk UUIDs before publication.
+Kernel images, initramfs files, source trees, private keys and build archives are excluded. The published inventory omits personal paths, host identifiers and disk UUIDs.

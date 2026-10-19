@@ -1,5 +1,4 @@
 work/
-*.partial.csv
 vmlinuz*
 initrd*
 System.map*

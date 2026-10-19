@@ -13,8 +13,8 @@ These commands summarize the targets and parallelism; they are not standalone re
 
 The source archive and patch references are in [patch provenance](../patches/references.json). Original configurations are identified by [SHA256](../configs/config-sha256.txt); only selected, sanitized differences are committed.
 
-Historical reports record successful compilation, signed images/modules and VM checks. Those checks have not been repeated in this project and are not startup-latency or battery-power evidence. No private keys, binaries, certificates or source trees are included.
+Historical reports record successful compilation, signed images/modules and VM checks. Those checks have not been repeated in this project and do not establish performance or battery-life benefits. No private keys, binaries, certificates or source trees are included.
 
-Some original notes described thinlto with lazy preemption. The later `custom.cfg` entry overrides it with `preempt=full`; the boot-parameter inventory takes precedence over older prose. Only reactive2 was live during phase 1. Other runtime states still require verification at their next boot.
+Some original notes described thinlto with lazy preemption. The later `custom.cfg` entry overrides it with `preempt=full`; the boot-parameter inventory takes precedence over older prose. Only reactive2 was live during the repository inventory. The other entries describe configured settings rather than verified runtime states.
 
 The configuration changes reflect the choices made for this laptop. Their performance benefits have not been established.

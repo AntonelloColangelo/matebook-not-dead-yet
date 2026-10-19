@@ -3,4 +3,4 @@ kernel	grub_id	performance_parameters	evidence
 7.2.9-kpl-efficiency	kpl-efficiency-7.2.9	preempt=lazy	custom.cfg
 7.2.9-kpl-thinlto	kpl-thinlto-7.2.9	preempt=full	custom.cfg
 7.2.9-kpl-reactive	kpl-reactive-7.2.9	rcu_nocbs=all rcutree.enable_rcu_lazy=1	custom.cfg
-7.2.9-kpl-reactive2	kpl-reactive2-7.2.9	rcu_nocbs=all rcutree.enable_rcu_lazy=1	custom.cfg and live cmdline during phase 1
+7.2.9-kpl-reactive2	kpl-reactive2-7.2.9	rcu_nocbs=all rcutree.enable_rcu_lazy=1	custom.cfg and live cmdline during the repository inventory
