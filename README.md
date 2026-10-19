@@ -6,9 +6,9 @@ This project explores whether tuning the Linux kernel can help me keep using an 
 
 ## Why I worked on this
 
-I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while keeping everyday applications usable. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling).
+I'm a junior bioinformatician, and I want to keep using my Huawei MateBook 14 with a Ryzen 5 2500U and 8 GB of RAM. My main reason for this project is practical: I want to postpone buying a replacement while improving the laptop usability. I also use this laptop to connect remotely to the computer where I run my genome analyses, documented in my [whole-genome sequencing project](https://github.com/AntonelloColangelo/gpu-wgs-variant-calling).
 
-After moving from Windows 10 to Linux Mint, I explored kernel configurations for this hardware. I wanted to understand which scheduling, memory and build settings I could change.
+After moving from Windows 10 to Linux Mint (which was a big improvement), I explored kernel configurations for this hardware. I wanted to understand which scheduling, memory and build settings I could change.
 
 Viduka and colleagues studied the reuse of old computers with open source software [1]. Their work provides background for trying software changes before replacing hardware. It uses older Windows and Ubuntu versions, so it does not tell us how this laptop or today's applications will perform.
 
