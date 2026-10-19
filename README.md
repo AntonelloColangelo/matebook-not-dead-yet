@@ -50,8 +50,6 @@ The recorded Mint boot defaults also select full preemption. The shared `sysctl`
 
 ## Personal observations
 
-![Anecdotal comparison with Mint 7.0: reactive2 feels more immediate and responsive, with less stuttering during application use and when several programs are open.](docs/figures/personal-observations.svg)
-
 In everyday use, the laptop feels more immediate and responsive with `7.2.9-kpl-reactive2` than with the original Linux Mint `7.0.0-38-generic` kernel. I notice less stuttering when using applications and when opening several programs. The difference is particularly noticeable when multiple applications are open at the same time.
 
 These are anecdotal observations from my use of this laptop. They describe a perceived improvement, without quantifying it or establishing which kernel change caused it. The Mint kernel was the distribution-provided build, with the local system settings documented in this repository.
@@ -74,6 +72,6 @@ AI agents helped reconstruct and document the configurations under my direction.
 |---|---|
 | `configs/` | Kernel settings |
 | `patches/` | References for the kernel changes |
-| `docs/` | Build notes and SVG diagrams in `docs/figures/` |
+| `docs/` | Build notes and the kernel diagram in `docs/figures/` |
 
 Kernel images, initramfs files, source trees, private keys and build archives are excluded. The published inventory omits personal paths, host identifiers and disk UUIDs.
